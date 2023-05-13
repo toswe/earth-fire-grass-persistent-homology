@@ -19,6 +19,12 @@ COLORS = {
     FIRE: (255, 0, 0),
     GRASS: (0, 255, 0),
 }
+TILE_TO_TEXT = {
+    WATER: 'WATER',
+    EARTH: 'EARTH',
+    FIRE: 'FIRE',
+    GRASS: 'GRASS',
+}
 
 
 # Define the function for drawing the grid
@@ -65,6 +71,7 @@ def main():
     pygame.display.set_caption("Fire Simulation")
     screen = pygame.display.set_mode(WINDOW_SIZE)
     clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 20)
 
     # Init the grid to all grass
     # TODO Load the grid from a file
@@ -110,6 +117,12 @@ def main():
             update_grid(grid)
 
         draw_grid(screen, grid)
+        message = (
+            f"Simulation active: {simulation_active}, "
+            f"active coloring tile: {TILE_TO_TEXT[active_coloring_tile]}"
+        )
+        text = font.render(message, True, COLORS[EARTH])
+        screen.blit(text, [0, 0])
         # Update the screen and wait for the next frame
         pygame.display.flip()
         clock.tick(FRAMERATE)
