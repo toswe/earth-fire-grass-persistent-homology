@@ -9,6 +9,7 @@ WINDOW_SIZE = (CELL_WIDTH * GRID_SIZE, CELL_HEIGHT * GRID_SIZE)
 
 FRAMERATE = 30
 
+# Types
 WATER = 0
 EARTH = 1
 FIRE = 2
@@ -19,11 +20,41 @@ COLORS = {
     FIRE: (255, 0, 0),
     GRASS: (0, 255, 0),
 }
-TILE_TO_TEXT = {
+TYPE_TO_TEXT = {
     WATER: 'WATER',
     EARTH: 'EARTH',
     FIRE: 'FIRE',
     GRASS: 'GRASS',
+}
+
+EARTH_LIFESPAN = 3
+FIRE_LIFESPAN = 3
+
+# TODO Maybe create a class?
+# Tiles
+EARTH_TILE = {
+    'type': EARTH,
+    'lifespan': EARTH_LIFESPAN,
+    'next_type': GRASS,
+}
+FIRE_TILE = {
+    'type': FIRE,
+    'lifespan': FIRE_LIFESPAN,
+    'next_type': EARTH,
+}
+GRASS_TILE = {
+    'type': GRASS,
+    'lifespan': -1,
+}
+WATER_TILE = {
+    'type': WATER,
+    'lifespan': -1,
+}
+TYPE_TO_TILE = {
+    WATER: WATER_TILE,
+    EARTH: EARTH_TILE,
+    FIRE: FIRE_TILE,
+    GRASS: GRASS_TILE,
 }
 
 
@@ -31,38 +62,30 @@ TILE_TO_TEXT = {
 def draw_grid(screen, grid):
     for x in range(GRID_SIZE):
         for y in range(GRID_SIZE):
-            cell_color = COLORS[grid[x][y]]
+            cell_color = COLORS[grid[x][y]['type']]
             pygame.draw.rect(screen, cell_color, (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT))
 
 
 def update_grid(grid):
-    new_earth_cells = set()
-    new_fire_cells = set()
-    new_grass_cells = set()
-
-    for x in range(GRID_SIZE):
-        for y in range(GRID_SIZE):
-            cell = grid[x][y]
-            if cell == EARTH:
-                new_grass_cells.add((x, y))
-            if cell == FIRE:
-                new_earth_cells.add((x, y))
-            if cell == GRASS:
+    for x, row in enumerate(grid):
+        for y, tile in enumerate(row):
+            if tile['type'] == GRASS:
                 for dx in [-1, 0, 1]:
                     for dy in [-1, 0, 1]:
                         if dx == 0 and dy == 0:
                             continue
                         if x + dx < 0 or x + dx >= GRID_SIZE or y + dy < 0 or y + dy >= GRID_SIZE:
                             continue
-                        if grid[x + dx][y + dy] == FIRE:
-                            new_fire_cells.add((x, y))
+                        if grid[x + dx][y + dy]['type'] == FIRE:
+                            tile['next_type'] = FIRE
+                            tile['lifespan'] = 0
 
-    for x, y in new_earth_cells:
-        grid[x][y] = EARTH
-    for x, y in new_fire_cells:
-        grid[x][y] = FIRE
-    for x, y in new_grass_cells:
-        grid[x][y] = GRASS
+    for x, row in enumerate(grid):
+        for y, tile in enumerate(row):
+            if tile['lifespan'] == 0:
+                tile.update(TYPE_TO_TILE[tile['next_type']])
+            elif tile['lifespan'] > 0:
+                tile['lifespan'] -= 1
 
 
 def main():
@@ -75,10 +98,10 @@ def main():
 
     # Init the grid to all grass
     # TODO Load the grid from a file
-    grid = [[GRASS for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
+    grid = [[GRASS_TILE.copy() for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
 
     mouse_down = False
-    active_coloring_tile = GRASS
+    active_coloring_type = GRASS
     simulation_active = False
 
     # Main game loop
@@ -96,13 +119,13 @@ def main():
                     mouse_down = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
-                    active_coloring_tile = EARTH
+                    active_coloring_type = EARTH
                 elif event.key == pygame.K_2:
-                    active_coloring_tile = FIRE
+                    active_coloring_type = FIRE
                 elif event.key == pygame.K_3:
-                    active_coloring_tile = GRASS
+                    active_coloring_type = GRASS
                 elif event.key == pygame.K_4:
-                    active_coloring_tile = WATER
+                    active_coloring_type = WATER
                 elif event.key == pygame.K_SPACE:
                     simulation_active = not simulation_active
 
@@ -111,7 +134,7 @@ def main():
             mouse_pos = pygame.mouse.get_pos()
             cell_x = mouse_pos[0] // CELL_WIDTH
             cell_y = mouse_pos[1] // CELL_HEIGHT
-            grid[cell_x][cell_y] = active_coloring_tile
+            grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
             update_grid(grid)
@@ -119,7 +142,7 @@ def main():
         draw_grid(screen, grid)
         message = (
             f"Simulation active: {simulation_active}, "
-            f"active coloring tile: {TILE_TO_TEXT[active_coloring_tile]}"
+            f"active coloring tile: {TYPE_TO_TEXT[active_coloring_type]}"
         )
         text = font.render(message, True, COLORS[EARTH])
         screen.blit(text, [0, 0])
