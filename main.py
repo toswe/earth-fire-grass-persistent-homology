@@ -29,6 +29,36 @@ def draw_grid(screen, grid):
             pygame.draw.rect(screen, cell_color, (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT))
 
 
+def update_grid(grid):
+    new_earth_cells = set()
+    new_fire_cells = set()
+    new_grass_cells = set()
+
+    for x in range(GRID_SIZE):
+        for y in range(GRID_SIZE):
+            cell = grid[x][y]
+            if cell == EARTH:
+                new_grass_cells.add((x, y))
+            if cell == FIRE:
+                new_earth_cells.add((x, y))
+            if cell == GRASS:
+                for dx in [-1, 0, 1]:
+                    for dy in [-1, 0, 1]:
+                        if dx == 0 and dy == 0:
+                            continue
+                        if x + dx < 0 or x + dx >= GRID_SIZE or y + dy < 0 or y + dy >= GRID_SIZE:
+                            continue
+                        if grid[x + dx][y + dy] == FIRE:
+                            new_fire_cells.add((x, y))
+
+    for x, y in new_earth_cells:
+        grid[x][y] = EARTH
+    for x, y in new_fire_cells:
+        grid[x][y] = FIRE
+    for x, y in new_grass_cells:
+        grid[x][y] = GRASS
+
+
 def main():
     print("Initializing simulation.")
     pygame.init()
@@ -42,6 +72,7 @@ def main():
 
     mouse_down = False
     active_coloring_tile = GRASS
+    simulation_active = False
 
     # Main game loop
     done = False
@@ -65,6 +96,8 @@ def main():
                     active_coloring_tile = GRASS
                 elif event.key == pygame.K_4:
                     active_coloring_tile = WATER
+                elif event.key == pygame.K_SPACE:
+                    simulation_active = not simulation_active
 
         # Handle mouse input
         if mouse_down:
@@ -73,6 +106,8 @@ def main():
             cell_y = mouse_pos[1] // CELL_HEIGHT
             grid[cell_x][cell_y] = active_coloring_tile
 
+        if simulation_active:
+            update_grid(grid)
 
         draw_grid(screen, grid)
         # Update the screen and wait for the next frame
