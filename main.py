@@ -8,13 +8,15 @@ GRID_SIZE = 50
 WINDOW_SIZE = (CELL_WIDTH * GRID_SIZE, CELL_HEIGHT * GRID_SIZE)
 
 FRAMERATE = 30
+SIMPLE_COLORS = False
+TEXT_COLOR = (255, 255, 255)
 
 # Types
 WATER = 0
 EARTH = 1
 FIRE = 2
 GRASS = 3
-COLORS = {
+TYPE_TO_COLOR = {
     WATER: (0, 0, 255),
     EARTH: (0, 0, 0),
     FIRE: (255, 0, 0),
@@ -27,11 +29,11 @@ TYPE_TO_TEXT = {
     GRASS: 'GRASS',
 }
 
-EARTH_LIFESPAN = 300
-FIRE_LIFESPAN = 300
-FIRE_PROBABILITY = 0.01
+EARTH_LIFESPAN = 30
+FIRE_LIFESPAN = 30
+FIRE_PROBABILITY = 0.1
 
-# TODO Maybe create a class?
+# TODO Create tile class
 # Tiles
 EARTH_TILE = {
     'type': EARTH,
@@ -58,12 +60,40 @@ TYPE_TO_TILE = {
     GRASS: GRASS_TILE,
 }
 
+def get_color_pretty(tile):
+    base_color = TYPE_TO_COLOR[tile['type']]
+    # TODO Transition colors by avereging color tuples (numpy needed)
+    if tile['type'] == FIRE:
+        color_offset = (FIRE_LIFESPAN - tile['lifespan']) * 255 / FIRE_LIFESPAN
+        return (
+            base_color[0] - color_offset,
+            base_color[1],
+            base_color[2],
+        )
+    if tile['type'] == EARTH:
+        color_offset = (EARTH_LIFESPAN - tile['lifespan']) * 255 / EARTH_LIFESPAN
+        return (
+            base_color[0],
+            base_color[1] + color_offset,
+            base_color[2],
+        )
+    # TODO Add pretty colors for grass and water
+    return base_color
+
+
+def get_color_simple(tile):
+    return TYPE_TO_COLOR[tile['type']]
+
+
+def get_color(tile):
+    return get_color_simple(tile) if SIMPLE_COLORS else get_color_pretty(tile)
+
 
 # Define the function for drawing the grid
 def draw_grid(screen, grid):
-    for x in range(GRID_SIZE):
-        for y in range(GRID_SIZE):
-            cell_color = COLORS[grid[x][y]['type']]
+    for x, row in enumerate(grid):
+        for y, tile in enumerate(row):
+            cell_color = get_color(tile)
             pygame.draw.rect(screen, cell_color, (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT))
 
 
@@ -136,6 +166,9 @@ def main():
                     active_coloring_type = WATER
                 elif event.key == pygame.K_SPACE:
                     simulation_active = not simulation_active
+                elif event.key == pygame.K_c:
+                    global SIMPLE_COLORS
+                    SIMPLE_COLORS =  not SIMPLE_COLORS
 
         # Handle mouse input
         if mouse_down:
@@ -152,7 +185,7 @@ def main():
             f"Simulation active: {simulation_active}, "
             f"active coloring tile: {TYPE_TO_TEXT[active_coloring_type]}"
         )
-        text = font.render(message, True, COLORS[EARTH])
+        text = font.render(message, True, TEXT_COLOR)
         screen.blit(text, [0, 0])
         # Update the screen and wait for the next frame
         pygame.display.flip()
