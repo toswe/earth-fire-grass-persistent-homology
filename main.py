@@ -1,5 +1,5 @@
 import pygame
-
+import random
 
 # Set the dimensions of each cell and the grid size
 CELL_WIDTH = 10
@@ -27,8 +27,9 @@ TYPE_TO_TEXT = {
     GRASS: 'GRASS',
 }
 
-EARTH_LIFESPAN = 3
-FIRE_LIFESPAN = 3
+EARTH_LIFESPAN = 300
+FIRE_LIFESPAN = 300
+FIRE_PROBABILITY = 0.01
 
 # TODO Maybe create a class?
 # Tiles
@@ -66,6 +67,14 @@ def draw_grid(screen, grid):
             pygame.draw.rect(screen, cell_color, (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT))
 
 
+def set_fire(tile):
+    if random.random() < FIRE_PROBABILITY:
+        tile['next_type'] = FIRE
+        tile['lifespan'] = 0
+    return tile
+
+
+
 def update_grid(grid):
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
@@ -77,8 +86,7 @@ def update_grid(grid):
                         if x + dx < 0 or x + dx >= GRID_SIZE or y + dy < 0 or y + dy >= GRID_SIZE:
                             continue
                         if grid[x + dx][y + dy]['type'] == FIRE:
-                            tile['next_type'] = FIRE
-                            tile['lifespan'] = 0
+                            tile.update(set_fire(tile))
 
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
