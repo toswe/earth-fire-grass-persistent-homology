@@ -32,8 +32,8 @@ TYPE_TO_TEXT = {
     GRASS: "GRASS",
 }
 
-EARTH_LIFESPAN = 30
-FIRE_LIFESPAN = 30
+EARTH_LIFESPAN = 5
+FIRE_LIFESPAN = 5
 FIRE_PROBABILITY = 0.1
 
 # TODO Create tile class
@@ -106,29 +106,56 @@ def draw_grid(screen, grid):
 
 
 def set_fire(tile):
-    if random.random() < FIRE_PROBABILITY:
-        tile["next_type"] = FIRE
-        tile["lifespan"] = 0
-    return tile
+    tile["next_type"] = FIRE
+    tile["lifespan"] = 0
+
+
+def old_fire_handle(grid, x, y, tile):
+    if tile["type"] == GRASS:
+        for dx in [-1, 0, 1]:
+            for dy in [-1, 0, 1]:
+                if dx == 0 and dy == 0:
+                    continue
+                if (
+                    x + dx < 0
+                    or x + dx >= GRID_SIZE
+                    or y + dy < 0
+                    or y + dy >= GRID_SIZE
+                ):
+                    continue
+                if grid[x + dx][y + dy]["type"] == FIRE:
+                    if random.random() < FIRE_PROBABILITY:
+                        set_fire(tile)
+
+
+def new_fire_handle(grid, x, y, tile):
+    if tile["type"] == FIRE:
+        neighbour_grass = list()
+        for dx in [-1, 0, 1]:
+            for dy in [-1, 0, 1]:
+                if dx == 0 and dy == 0:
+                    continue
+                if (
+                    x + dx < 0
+                    or x + dx >= GRID_SIZE
+                    or y + dy < 0
+                    or y + dy >= GRID_SIZE
+                ):
+                    continue
+
+                if grid[x + dx][y + dy]["type"] == GRASS:
+                    neighbour_grass.append(grid[x + dx][y + dy])
+
+        if len(neighbour_grass) > 0:
+            grass = random.choice(neighbour_grass)
+            set_fire(grass)
 
 
 def update_grid(grid):
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
-            if tile["type"] == GRASS:
-                for dx in [-1, 0, 1]:
-                    for dy in [-1, 0, 1]:
-                        if dx == 0 and dy == 0:
-                            continue
-                        if (
-                            x + dx < 0
-                            or x + dx >= GRID_SIZE
-                            or y + dy < 0
-                            or y + dy >= GRID_SIZE
-                        ):
-                            continue
-                        if grid[x + dx][y + dy]["type"] == FIRE:
-                            tile.update(set_fire(tile))
+            # old_fire_handle(grid, x, y, tile)
+            new_fire_handle(grid, x, y, tile)
 
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
