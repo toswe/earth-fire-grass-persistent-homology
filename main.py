@@ -5,10 +5,10 @@ from datetime import datetime
 import sys
 
 # Set the dimensions of each cell and the grid size
-CELL_WIDTH = 10
-CELL_HEIGHT = 10
-GRID_SIZE = 50
-WINDOW_SIZE = (CELL_WIDTH * GRID_SIZE, CELL_HEIGHT * GRID_SIZE)
+GRID_SIZE = 12
+WINDOW_EDGE_SIZE = 500
+CELL_SIZE = WINDOW_EDGE_SIZE // GRID_SIZE
+WINDOW_SIZE = (CELL_SIZE * GRID_SIZE, CELL_SIZE * GRID_SIZE)
 
 FRAMERATE = 30
 SIMPLE_COLORS = False
@@ -101,7 +101,7 @@ def draw_grid(screen, grid):
             pygame.draw.rect(
                 screen,
                 cell_color,
-                (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT),
+                (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
             )
 
 
@@ -240,8 +240,8 @@ def main():
         # Handle mouse input
         if mouse_down:
             mouse_pos = pygame.mouse.get_pos()
-            cell_x = mouse_pos[0] // CELL_WIDTH
-            cell_y = mouse_pos[1] // CELL_HEIGHT
+            cell_x = mouse_pos[0] // CELL_SIZE
+            cell_y = mouse_pos[1] // CELL_SIZE
             grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
