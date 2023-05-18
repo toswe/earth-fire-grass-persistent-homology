@@ -219,6 +219,8 @@ def main():
     else:
         grid = create_default_grid()
 
+    history = []
+
     mouse_down = False
     active_coloring_type = GRASS
     simulation_active = False
@@ -262,6 +264,7 @@ def main():
 
         if simulation_active:
             update_grid(grid)
+            history.append(grid_to_matrix(grid))
 
         draw_grid(screen, grid)
         message = (
@@ -273,6 +276,11 @@ def main():
         # Update the screen and wait for the next frame
         pygame.display.flip()
         clock.tick(FRAMERATE)
+
+    # TODO Implement this better
+    file_path = f"./history/{get_time()}.json"
+    with open(file_path, "w") as file:
+        json.dump(grid_to_matrix(history), file)
 
     # Quit Pygame
     pygame.quit()
