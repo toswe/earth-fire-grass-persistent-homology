@@ -5,10 +5,21 @@ from datetime import datetime
 import sys
 
 # Set the dimensions of each cell and the grid size
-GRID_SIZE = 12
+GRID_SIZE = 50
 WINDOW_EDGE_SIZE = 500
-CELL_SIZE = WINDOW_EDGE_SIZE // GRID_SIZE
-WINDOW_SIZE = (CELL_SIZE * GRID_SIZE, CELL_SIZE * GRID_SIZE)
+CELL_SIZE = 0
+WINDOW_SIZE = 0
+
+
+# TODO Implement this better
+def init_cell_and_window():
+    global CELL_SIZE
+    CELL_SIZE = WINDOW_EDGE_SIZE // GRID_SIZE
+    global WINDOW_SIZE
+    WINDOW_SIZE = (CELL_SIZE * GRID_SIZE, CELL_SIZE * GRID_SIZE)
+
+
+init_cell_and_window()
 
 FRAMERATE = 30
 SIMPLE_COLORS = False
@@ -32,8 +43,8 @@ TYPE_TO_TEXT = {
     GRASS: "GRASS",
 }
 
-EARTH_LIFESPAN = 5
-FIRE_LIFESPAN = 5
+EARTH_LIFESPAN = 30
+FIRE_LIFESPAN = 30
 FIRE_PROBABILITY = 0.1
 
 # TODO Create tile class
@@ -165,9 +176,8 @@ def update_grid(grid):
                 tile["lifespan"] -= 1
 
 
-# TODO Maybe needed for history?
-# def grid_to_matrix(grid):
-#     return [[tile['type'] for tile in row] for row in grid]
+def grid_to_matrix(grid):
+    return [[tile["type"] for tile in row] for row in grid]
 
 
 def get_time():
@@ -177,7 +187,7 @@ def get_time():
 def save_grid(grid):
     file_path = f"./saves/{get_time()}.json"
     with open(file_path, "w") as file:
-        json.dump(grid, file)
+        json.dump(grid_to_matrix(grid), file)
     return file_path
 
 
@@ -187,7 +197,13 @@ def create_default_grid():
 
 def load_grid(file_path):
     with open(file_path) as file:
-        return json.load(file)
+        matrix = json.load(file)
+
+    global GRID_SIZE
+    GRID_SIZE = len(matrix)
+    init_cell_and_window()
+
+    return [[TYPE_TO_TILE[tile_type].copy() for tile_type in row] for row in matrix]
 
 
 def main():
