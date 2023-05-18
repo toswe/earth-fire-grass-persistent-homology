@@ -1,5 +1,8 @@
 import pygame
 import random
+import json
+from datetime import datetime
+import sys
 
 # Set the dimensions of each cell and the grid size
 CELL_WIDTH = 10
@@ -126,6 +129,31 @@ def update_grid(grid):
                 tile['lifespan'] -= 1
 
 
+# TODO Maybe needed for history?
+# def grid_to_matrix(grid):
+#     return [[tile['type'] for tile in row] for row in grid]
+
+
+def get_time():
+    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+
+def save_grid(grid):
+    file_path = f'./saves/{get_time()}.json'
+    with open(file_path, 'w') as file:
+        json.dump(grid, file)
+    return file_path
+
+
+def create_default_grid():
+    return [[GRASS_TILE.copy() for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
+
+
+def load_grid(file_path):
+    with open(file_path) as file:
+        return json.load(file)
+
+
 def main():
     print("Initializing simulation.")
     pygame.init()
@@ -134,9 +162,10 @@ def main():
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 20)
 
-    # Init the grid to all grass
-    # TODO Load the grid from a file
-    grid = [[GRASS_TILE.copy() for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
+    if len(sys.argv) == 2:
+        grid = load_grid(sys.argv[1])
+    else:
+        grid = create_default_grid()
 
     mouse_down = False
     active_coloring_type = GRASS
@@ -169,6 +198,8 @@ def main():
                 elif event.key == pygame.K_c:
                     global SIMPLE_COLORS
                     SIMPLE_COLORS =  not SIMPLE_COLORS
+                elif event.key == pygame.K_s:
+                    save_grid(grid)
 
         # Handle mouse input
         if mouse_down:
