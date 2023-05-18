@@ -26,10 +26,10 @@ TYPE_TO_COLOR = {
     GRASS: (0, 255, 0),
 }
 TYPE_TO_TEXT = {
-    WATER: 'WATER',
-    EARTH: 'EARTH',
-    FIRE: 'FIRE',
-    GRASS: 'GRASS',
+    WATER: "WATER",
+    EARTH: "EARTH",
+    FIRE: "FIRE",
+    GRASS: "GRASS",
 }
 
 EARTH_LIFESPAN = 30
@@ -39,22 +39,22 @@ FIRE_PROBABILITY = 0.1
 # TODO Create tile class
 # Tiles
 EARTH_TILE = {
-    'type': EARTH,
-    'lifespan': EARTH_LIFESPAN,
-    'next_type': GRASS,
+    "type": EARTH,
+    "lifespan": EARTH_LIFESPAN,
+    "next_type": GRASS,
 }
 FIRE_TILE = {
-    'type': FIRE,
-    'lifespan': FIRE_LIFESPAN,
-    'next_type': EARTH,
+    "type": FIRE,
+    "lifespan": FIRE_LIFESPAN,
+    "next_type": EARTH,
 }
 GRASS_TILE = {
-    'type': GRASS,
-    'lifespan': -1,
+    "type": GRASS,
+    "lifespan": -1,
 }
 WATER_TILE = {
-    'type': WATER,
-    'lifespan': -1,
+    "type": WATER,
+    "lifespan": -1,
 }
 TYPE_TO_TILE = {
     WATER: WATER_TILE,
@@ -63,18 +63,19 @@ TYPE_TO_TILE = {
     GRASS: GRASS_TILE,
 }
 
+
 def get_color_pretty(tile):
-    base_color = TYPE_TO_COLOR[tile['type']]
+    base_color = TYPE_TO_COLOR[tile["type"]]
     # TODO Transition colors by avereging color tuples (numpy needed)
-    if tile['type'] == FIRE:
-        color_offset = (FIRE_LIFESPAN - tile['lifespan']) * 255 / FIRE_LIFESPAN
+    if tile["type"] == FIRE:
+        color_offset = (FIRE_LIFESPAN - tile["lifespan"]) * 255 / FIRE_LIFESPAN
         return (
             base_color[0] - color_offset,
             base_color[1],
             base_color[2],
         )
-    if tile['type'] == EARTH:
-        color_offset = (EARTH_LIFESPAN - tile['lifespan']) * 255 / EARTH_LIFESPAN
+    if tile["type"] == EARTH:
+        color_offset = (EARTH_LIFESPAN - tile["lifespan"]) * 255 / EARTH_LIFESPAN
         return (
             base_color[0],
             base_color[1] + color_offset,
@@ -85,7 +86,7 @@ def get_color_pretty(tile):
 
 
 def get_color_simple(tile):
-    return TYPE_TO_COLOR[tile['type']]
+    return TYPE_TO_COLOR[tile["type"]]
 
 
 def get_color(tile):
@@ -97,36 +98,44 @@ def draw_grid(screen, grid):
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
             cell_color = get_color(tile)
-            pygame.draw.rect(screen, cell_color, (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT))
+            pygame.draw.rect(
+                screen,
+                cell_color,
+                (x * CELL_WIDTH, y * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT),
+            )
 
 
 def set_fire(tile):
     if random.random() < FIRE_PROBABILITY:
-        tile['next_type'] = FIRE
-        tile['lifespan'] = 0
+        tile["next_type"] = FIRE
+        tile["lifespan"] = 0
     return tile
-
 
 
 def update_grid(grid):
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
-            if tile['type'] == GRASS:
+            if tile["type"] == GRASS:
                 for dx in [-1, 0, 1]:
                     for dy in [-1, 0, 1]:
                         if dx == 0 and dy == 0:
                             continue
-                        if x + dx < 0 or x + dx >= GRID_SIZE or y + dy < 0 or y + dy >= GRID_SIZE:
+                        if (
+                            x + dx < 0
+                            or x + dx >= GRID_SIZE
+                            or y + dy < 0
+                            or y + dy >= GRID_SIZE
+                        ):
                             continue
-                        if grid[x + dx][y + dy]['type'] == FIRE:
+                        if grid[x + dx][y + dy]["type"] == FIRE:
                             tile.update(set_fire(tile))
 
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
-            if tile['lifespan'] == 0:
-                tile.update(TYPE_TO_TILE[tile['next_type']])
-            elif tile['lifespan'] > 0:
-                tile['lifespan'] -= 1
+            if tile["lifespan"] == 0:
+                tile.update(TYPE_TO_TILE[tile["next_type"]])
+            elif tile["lifespan"] > 0:
+                tile["lifespan"] -= 1
 
 
 # TODO Maybe needed for history?
@@ -139,8 +148,8 @@ def get_time():
 
 
 def save_grid(grid):
-    file_path = f'./saves/{get_time()}.json'
-    with open(file_path, 'w') as file:
+    file_path = f"./saves/{get_time()}.json"
+    with open(file_path, "w") as file:
         json.dump(grid, file)
     return file_path
 
@@ -197,7 +206,7 @@ def main():
                     simulation_active = not simulation_active
                 elif event.key == pygame.K_c:
                     global SIMPLE_COLORS
-                    SIMPLE_COLORS =  not SIMPLE_COLORS
+                    SIMPLE_COLORS = not SIMPLE_COLORS
                 elif event.key == pygame.K_s:
                     save_grid(grid)
 
