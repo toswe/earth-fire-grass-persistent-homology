@@ -1,14 +1,23 @@
-import pygame
 import random
 import json
 from datetime import datetime
 import sys
+
+import pygame
+
+from process_history import process_history
 
 # Set the dimensions of each cell and the grid size
 GRID_SIZE = 12
 WINDOW_EDGE_SIZE = 500
 CELL_SIZE = 0
 WINDOW_SIZE = 0
+
+FRAMERATE = 30
+SIMPLE_COLORS = False
+TEXT_COLOR = (255, 255, 255)
+SAVE_HISTORY = False
+PROCESS_HISTORY = True
 
 
 # TODO Implement this better
@@ -20,11 +29,6 @@ def init_cell_and_window():
 
 
 init_cell_and_window()
-
-FRAMERATE = 30
-SIMPLE_COLORS = False
-TEXT_COLOR = (255, 255, 255)
-SAVE_HISTORY = True
 
 # Types
 WATER = 0
@@ -230,7 +234,7 @@ def main():
     else:
         grid = create_default_grid()
 
-    if SAVE_HISTORY:
+    if SAVE_HISTORY or PROCESS_HISTORY:
         history = []
 
     mouse_down = False
@@ -275,7 +279,7 @@ def main():
             grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
-            if SAVE_HISTORY:
+            if SAVE_HISTORY or PROCESS_HISTORY:
                 history.append(grid_to_matrix(grid))
             update_grid(grid)
 
@@ -290,6 +294,10 @@ def main():
         pygame.display.flip()
         clock.tick(FRAMERATE)
 
+    # Quit Pygame
+    pygame.quit()
+    print("Simulation finished.")
+
     # TODO Implement this better
     if SAVE_HISTORY:
         if file_path:
@@ -302,9 +310,8 @@ def main():
         with open(file_path, "w") as file:
             json.dump(history, file)
 
-    # Quit Pygame
-    pygame.quit()
-    print("Simulation finished.")
+    if PROCESS_HISTORY:
+        process_history(history)
 
 
 if __name__ == "__main__":
