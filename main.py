@@ -24,7 +24,7 @@ init_cell_and_window()
 FRAMERATE = 30
 SIMPLE_COLORS = False
 TEXT_COLOR = (255, 255, 255)
-SAVE_HISTORY = False
+SAVE_HISTORY = True
 
 # Types
 WATER = 0
@@ -275,9 +275,9 @@ def main():
             grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
-            update_grid(grid)
             if SAVE_HISTORY:
                 history.append(grid_to_matrix(grid))
+            update_grid(grid)
 
         draw_grid(screen, grid)
         message = (
