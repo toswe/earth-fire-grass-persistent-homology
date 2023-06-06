@@ -6,7 +6,7 @@ import matplotlib.pyplot as plot
 import gudhi
 
 
-def process_history(history):
+def history_to_points(history):
     points = []
     for z, grid in enumerate(history):
         # print()
@@ -19,15 +19,9 @@ def process_history(history):
     return points
 
 
-def main():
-    if len(sys.argv) != 2:
-        print("Missing history...")
-        return
-
-    with open(sys.argv[1], "r") as file:
-        history = json.load(file)
+def process_history(history):
     print(f"History length: {len(history)}")
-    points = process_history(history)
+    points = history_to_points(history)
     del history
 
     print("Creating Rips Complex")
@@ -43,6 +37,17 @@ def main():
 
     gudhi.plot_persistence_diagram(diag)
     plot.show()
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Missing history...")
+        return
+
+    with open(sys.argv[1], "r") as file:
+        history = json.load(file)
+
+    process_history(history)
 
 
 if __name__ == "__main__":
