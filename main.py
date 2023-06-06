@@ -24,13 +24,20 @@ init_cell_and_window()
 FRAMERATE = 30
 SIMPLE_COLORS = False
 TEXT_COLOR = (255, 255, 255)
-SAVE_HISTORY = True
+SAVE_HISTORY = False
 
 # Types
 WATER = 0
 EARTH = 1
 FIRE = 2
 GRASS = 3
+
+TILE_LIFESPAN = 5
+EARTH_LIFESPAN = TILE_LIFESPAN
+FIRE_LIFESPAN = TILE_LIFESPAN
+# Depricated
+FIRE_PROBABILITY = 0.1
+
 TYPE_TO_COLOR = {
     WATER: (0, 0, 255),
     EARTH: (0, 0, 0),
@@ -44,23 +51,22 @@ TYPE_TO_TEXT = {
     GRASS: "GRASS",
 }
 
-TILE_LIFESPAN = 5
-EARTH_LIFESPAN = TILE_LIFESPAN
-FIRE_LIFESPAN = TILE_LIFESPAN
-# Depricated
-FIRE_PROBABILITY = 0.1
+TYPE_TRANSITIONS = {
+    WATER: WATER,
+    EARTH: GRASS,
+    FIRE: EARTH,
+    GRASS: FIRE,
+}
 
 # TODO Create tile class
 # Tiles
 EARTH_TILE = {
     "type": EARTH,
     "lifespan": EARTH_LIFESPAN,
-    "next_type": GRASS,
 }
 FIRE_TILE = {
     "type": FIRE,
     "lifespan": FIRE_LIFESPAN,
-    "next_type": EARTH,
 }
 GRASS_TILE = {
     "type": GRASS,
@@ -120,7 +126,6 @@ def draw_grid(screen, grid):
 
 
 def set_fire(tile):
-    tile["next_type"] = FIRE
     tile["lifespan"] = 0
 
 
@@ -175,7 +180,7 @@ def update_grid(grid):
     for x, row in enumerate(grid):
         for y, tile in enumerate(row):
             if tile["lifespan"] == 0:
-                tile.update(TYPE_TO_TILE[tile["next_type"]])
+                tile.update(TYPE_TO_TILE[TYPE_TRANSITIONS[tile["type"]]])
             elif tile["lifespan"] > 0:
                 tile["lifespan"] -= 1
 
@@ -217,7 +222,7 @@ def main():
     screen = pygame.display.set_mode(WINDOW_SIZE)
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 20)
-    file_path = ''
+    file_path = ""
 
     if len(sys.argv) == 2:
         file_path = sys.argv[1]
@@ -225,7 +230,8 @@ def main():
     else:
         grid = create_default_grid()
 
-    history = []
+    if SAVE_HISTORY:
+        history = []
 
     mouse_down = False
     active_coloring_type = GRASS
@@ -270,7 +276,8 @@ def main():
 
         if simulation_active:
             update_grid(grid)
-            history.append(grid_to_matrix(grid))
+            if SAVE_HISTORY:
+                history.append(grid_to_matrix(grid))
 
         draw_grid(screen, grid)
         message = (
@@ -286,7 +293,7 @@ def main():
     # TODO Implement this better
     if SAVE_HISTORY:
         if file_path:
-            file_path = file_path.replace('saves', 'history')
+            file_path = file_path.replace("saves", "history")
         else:
             file_path = f"./history/{get_time()}.json"
 
