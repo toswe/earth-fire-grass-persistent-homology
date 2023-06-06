@@ -5,7 +5,7 @@ from datetime import datetime
 import sys
 
 # Set the dimensions of each cell and the grid size
-GRID_SIZE = 50
+GRID_SIZE = 12
 WINDOW_EDGE_SIZE = 500
 CELL_SIZE = 0
 WINDOW_SIZE = 0
@@ -24,6 +24,7 @@ init_cell_and_window()
 FRAMERATE = 30
 SIMPLE_COLORS = False
 TEXT_COLOR = (255, 255, 255)
+SAVE_HISTORY = True
 
 # Types
 WATER = 0
@@ -43,8 +44,10 @@ TYPE_TO_TEXT = {
     GRASS: "GRASS",
 }
 
-EARTH_LIFESPAN = 30
-FIRE_LIFESPAN = 30
+TILE_LIFESPAN = 5
+EARTH_LIFESPAN = TILE_LIFESPAN
+FIRE_LIFESPAN = TILE_LIFESPAN
+# Depricated
 FIRE_PROBABILITY = 0.1
 
 # TODO Create tile class
@@ -121,6 +124,7 @@ def set_fire(tile):
     tile["lifespan"] = 0
 
 
+# Depricated
 def old_fire_handle(grid, x, y, tile):
     if tile["type"] == GRASS:
         for dx in [-1, 0, 1]:
@@ -213,9 +217,11 @@ def main():
     screen = pygame.display.set_mode(WINDOW_SIZE)
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 20)
+    file_path = ''
 
     if len(sys.argv) == 2:
-        grid = load_grid(sys.argv[1])
+        file_path = sys.argv[1]
+        grid = load_grid(file_path)
     else:
         grid = create_default_grid()
 
@@ -278,9 +284,16 @@ def main():
         clock.tick(FRAMERATE)
 
     # TODO Implement this better
-    file_path = f"./history/{get_time()}.json"
-    with open(file_path, "w") as file:
-        json.dump(grid_to_matrix(history), file)
+    if SAVE_HISTORY:
+        if file_path:
+            file_path = file_path.replace('saves', 'history')
+        else:
+            file_path = f"./history/{get_time()}.json"
+
+        print(f"Saving history to: {file_path}")
+
+        with open(file_path, "w") as file:
+            json.dump(history, file)
 
     # Quit Pygame
     pygame.quit()
