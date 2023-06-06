@@ -16,9 +16,9 @@ WINDOW_SIZE = 0
 FRAMERATE = 30
 SIMPLE_COLORS = False
 TEXT_COLOR = (255, 255, 255)
-SAVE_HISTORY = False
-PROCESS_HISTORY = True
-
+SAVE_HISTORY = True
+PROCESS_HISTORY = False
+DEFAULT_FILE_PATH = f"./saves/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
 
 # TODO Implement this better
 def init_cell_and_window():
@@ -193,12 +193,7 @@ def grid_to_matrix(grid):
     return [[tile["type"] for tile in row] for row in grid]
 
 
-def get_time():
-    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-
-def save_grid(grid):
-    file_path = f"./saves/{get_time()}.json"
+def save_grid(grid, file_path):
     with open(file_path, "w") as file:
         json.dump(grid_to_matrix(grid), file)
     return file_path
@@ -226,8 +221,8 @@ def main():
     screen = pygame.display.set_mode(WINDOW_SIZE)
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 20)
-    file_path = ""
 
+    file_path = DEFAULT_FILE_PATH
     if len(sys.argv) == 2:
         file_path = sys.argv[1]
         grid = load_grid(file_path)
@@ -269,7 +264,7 @@ def main():
                     global SIMPLE_COLORS
                     SIMPLE_COLORS = not SIMPLE_COLORS
                 elif event.key == pygame.K_s:
-                    save_grid(grid)
+                    save_grid(grid, file_path)
 
         # Handle mouse input
         if mouse_down:
@@ -300,10 +295,8 @@ def main():
 
     # TODO Implement this better
     if SAVE_HISTORY:
-        if file_path:
-            file_path = file_path.replace("saves", "history")
-        else:
-            file_path = f"./history/{get_time()}.json"
+        if file_path != DEFAULT_FILE_PATH:
+            file_path = f"./history/{file_path.split('/')[-1]}"
 
         print(f"Saving history to: {file_path}")
 
