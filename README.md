@@ -16,7 +16,7 @@ Python 3.10.4 was used for this project.
 
 1. Installing the required libraries:
     ```
-    pip install requirements.txt -r
+    pip install -r requirements.txt
     ```
 
 2. Run the script with:

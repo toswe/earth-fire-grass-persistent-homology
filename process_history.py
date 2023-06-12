@@ -4,12 +4,18 @@ import sys
 
 import matplotlib.pyplot as plot
 import gudhi
+import numpy
 
 TRIVIAL_HOLES = {
     (3, (1.4142135623730951, 1.7320508075688772)),
     (1, (1.0, 1.4142135623730951)),
     (0, (0.0, 1.0)),
+    (0, (0.0, 0.25)),
+    (1, (0.25, 0.5)),
+    (0, (0.0, numpy.inf)),
 }
+USE_ALPHA_COMPLEX = True
+
 
 def history_to_points(history):
     points = []
@@ -29,22 +35,35 @@ def process_history(history):
     points = history_to_points(history)
     del history
 
-    print("Creating Rips Complex")
-    # rips = gudhi.RipsComplex(points=points, max_edge_length=2.1, sparse=0.25)
-    rips = gudhi.RipsComplex(points=points, max_edge_length=2.1)
+    if USE_ALPHA_COMPLEX:
+        print("Creating Alpha Complex")
+        alpha = gudhi.AlphaComplex(points=points)
 
-    print("Creating simplex tree")
-    simplex_tree = rips.create_simplex_tree(max_dimension=4)
+        print("Creating simplex tree")
+        simplex_tree = alpha.create_simplex_tree()
 
-    print("Running simplex_tree.persistence()")
-    # diag = simplex_tree.persistence(homology_coeff_field=2, min_persistence=0)
-    diag = simplex_tree.persistence()
-    # print("diag=", diag)
+        print("Running simplex_tree.persistence()")
+        diag = simplex_tree.persistence()
+        diag = [d for d in diag if d not in TRIVIAL_HOLES]
+
+    else:
+        # Deprecated, too slow and memory intensive
+
+        print("Creating Rips Complex")
+        # rips = gudhi.RipsComplex(points=points, max_edge_length=2.1, sparse=0.25)
+        rips = gudhi.RipsComplex(points=points, max_edge_length=2.5)
+
+        print("Creating simplex tree")
+        simplex_tree = rips.create_simplex_tree(max_dimension=3)
+
+        print("Running simplex_tree.persistence()")
+        diag = simplex_tree.persistence(homology_coeff_field=2, min_persistence=0)
 
     diag = [d for d in diag if d not in TRIVIAL_HOLES]
+    print("diag=", diag)
 
     gudhi.plot_persistence_diagram(diag)
-    # gudhi.plot_persistence_barcode(diag, max_intervals=0)
+    gudhi.plot_persistence_barcode(diag, max_intervals=30)
     plot.show()
 
 

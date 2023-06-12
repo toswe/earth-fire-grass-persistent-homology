@@ -13,12 +13,13 @@ WINDOW_EDGE_SIZE = 500
 CELL_SIZE = 0
 WINDOW_SIZE = 0
 
+TILE_LIFESPAN = 5
 FRAMERATE = 30
 SIMPLE_COLORS = False
-TEXT_COLOR = (255, 255, 255)
-SAVE_HISTORY = True
+SAVE_HISTORY = False
 PROCESS_HISTORY = False
 DEFAULT_FILE_PATH = f"./saves/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
+TEXT_COLOR = (255, 255, 255)
 
 # TODO Implement this better
 def init_cell_and_window():
@@ -36,7 +37,6 @@ EARTH = 1
 FIRE = 2
 GRASS = 3
 
-TILE_LIFESPAN = 5
 EARTH_LIFESPAN = TILE_LIFESPAN
 FIRE_LIFESPAN = TILE_LIFESPAN
 # Depricated
@@ -92,14 +92,14 @@ def get_color_pretty(tile):
     base_color = TYPE_TO_COLOR[tile["type"]]
     # TODO Transition colors by avereging color tuples (numpy needed)
     if tile["type"] == FIRE:
-        color_offset = (FIRE_LIFESPAN - tile["lifespan"]) * 255 / FIRE_LIFESPAN
+        color_offset = (FIRE_LIFESPAN - tile["lifespan"]) * 255 / (FIRE_LIFESPAN or 1)
         return (
             base_color[0] - color_offset,
             base_color[1],
             base_color[2],
         )
     if tile["type"] == EARTH:
-        color_offset = (EARTH_LIFESPAN - tile["lifespan"]) * 255 / EARTH_LIFESPAN
+        color_offset = (EARTH_LIFESPAN - tile["lifespan"]) * 255 / (EARTH_LIFESPAN or 1)
         return (
             base_color[0],
             base_color[1] + color_offset,
