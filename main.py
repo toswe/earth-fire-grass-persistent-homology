@@ -8,21 +8,16 @@ from pygame_screen_recorder import pygame_screen_recorder as pgr
 
 from process_history import process_history
 
-###################################################
-############ CONFIGURATION VARIABLES ##############
-###################################################
+CONFIGURATION = {
+    "GRID_SIZE": 12,
+    "TILE_LIFESPAN": 5,
+    "SAVE_HISTORY": False,
+    "PROCESS_HISTORY": False,
+    "FRAMERATE": 30,
+    "RECORD_GAME": False,
+}
 
-GRID_SIZE = 12
-TILE_LIFESPAN = 5
-SAVE_HISTORY = False
-PROCESS_HISTORY = False
-FRAMERATE = 30
 SIMPLE_COLORS = False
-RECORD_GAME = True
-
-###################################################
-############### GLOBAL VARIABLES ##################
-###################################################
 
 WINDOW_EDGE_SIZE = 500
 CELL_SIZE = 0
@@ -34,9 +29,9 @@ TEXT_COLOR = (255, 255, 255)
 # TODO Implement this better
 def init_cell_and_window():
     global CELL_SIZE
-    CELL_SIZE = WINDOW_EDGE_SIZE // GRID_SIZE
+    CELL_SIZE = WINDOW_EDGE_SIZE // CONFIGURATION["GRID_SIZE"]
     global WINDOW_SIZE
-    WINDOW_SIZE = (CELL_SIZE * GRID_SIZE, CELL_SIZE * GRID_SIZE)
+    WINDOW_SIZE = (CELL_SIZE * CONFIGURATION["GRID_SIZE"], CELL_SIZE * CONFIGURATION["GRID_SIZE"])
 
 
 init_cell_and_window()
@@ -47,8 +42,8 @@ EARTH = 1
 FIRE = 2
 GRASS = 3
 
-EARTH_LIFESPAN = TILE_LIFESPAN
-FIRE_LIFESPAN = TILE_LIFESPAN
+EARTH_LIFESPAN = CONFIGURATION["TILE_LIFESPAN"]
+FIRE_LIFESPAN = CONFIGURATION["TILE_LIFESPAN"]
 
 # Depricated
 FIRE_PROBABILITY = 0.1
@@ -153,9 +148,9 @@ def old_fire_handle(grid, x, y, tile):
                     continue
                 if (
                     x + dx < 0
-                    or x + dx >= GRID_SIZE
+                    or x + dx >= CONFIGURATION["GRID_SIZE"]
                     or y + dy < 0
-                    or y + dy >= GRID_SIZE
+                    or y + dy >= CONFIGURATION["GRID_SIZE"]
                 ):
                     continue
                 if grid[x + dx][y + dy]["type"] == FIRE:
@@ -172,9 +167,9 @@ def new_fire_handle(grid, x, y, tile):
                     continue
                 if (
                     x + dx < 0
-                    or x + dx >= GRID_SIZE
+                    or x + dx >= CONFIGURATION["GRID_SIZE"]
                     or y + dy < 0
-                    or y + dy >= GRID_SIZE
+                    or y + dy >= CONFIGURATION["GRID_SIZE"]
                 ):
                     continue
 
@@ -211,15 +206,15 @@ def save_grid(grid, file_path):
 
 
 def create_default_grid():
-    return [[GRASS_TILE.copy() for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
+    return [[GRASS_TILE.copy() for x in range(CONFIGURATION["GRID_SIZE"])] for y in range(CONFIGURATION["GRID_SIZE"])]
 
 
 def load_grid(file_path):
     with open(file_path) as file:
         matrix = json.load(file)
 
-    global GRID_SIZE
-    GRID_SIZE = len(matrix)
+    global CONFIGURATION
+    CONFIGURATION["GRID_SIZE"] = len(matrix)
     init_cell_and_window()
 
     return [[TYPE_TO_TILE[tile_type].copy() for tile_type in row] for row in matrix]
@@ -241,10 +236,10 @@ def main():
     else:
         grid = create_default_grid()
 
-    if RECORD_GAME:
+    if CONFIGURATION["RECORD_GAME"]:
         recorder = pgr(f"recordings/{file_path.split('/')[-1][:-5]}.gif")
 
-    if SAVE_HISTORY or PROCESS_HISTORY:
+    if CONFIGURATION["SAVE_HISTORY"] or CONFIGURATION["PROCESS_HISTORY"]:
         history = []
 
     mouse_down = False
@@ -289,11 +284,11 @@ def main():
             grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
-            if SAVE_HISTORY or PROCESS_HISTORY:
+            if CONFIGURATION["SAVE_HISTORY"] or CONFIGURATION["PROCESS_HISTORY"]:
                 history.append(grid_to_matrix(grid))
             update_grid(grid)
 
-            if RECORD_GAME:
+            if CONFIGURATION["RECORD_GAME"]:
                 recorder.click(screen)
 
         draw_grid(screen, grid)
@@ -305,9 +300,9 @@ def main():
         screen.blit(text, [0, 0])
         # Update the screen and wait for the next frame
         pygame.display.flip()
-        clock.tick(FRAMERATE)
+        clock.tick(CONFIGURATION["FRAMERATE"])
 
-    if RECORD_GAME:
+    if CONFIGURATION["RECORD_GAME"]:
         print("Saving recording.")
         recorder.save()
 
@@ -316,7 +311,7 @@ def main():
     print("Simulation finished.")
 
     # TODO Implement this better
-    if SAVE_HISTORY:
+    if CONFIGURATION["SAVE_HISTORY"]:
         if file_path != DEFAULT_FILE_PATH:
             file_path = f"./history/{file_path.split('/')[-1]}"
 
@@ -325,7 +320,7 @@ def main():
         with open(file_path, "w") as file:
             json.dump(history, file)
 
-    if PROCESS_HISTORY:
+    if CONFIGURATION["PROCESS_HISTORY"]:
         process_history(history)
 
 
