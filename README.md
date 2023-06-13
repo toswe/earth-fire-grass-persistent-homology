@@ -43,7 +43,17 @@ Python 3.10.4 was used for this project.
 
 ## Examples
 
-TODO
+Examples can be found in the `examples` directory, to run them do:
+```
+# First example given in the original paper
+python main.py saves/postavka_u_zadatku_5.json
+
+# Second example given in the original paper
+python main.py saves/postavka_u_zadatku_2.json
+
+# Island with an infinite fire
+python main.py saves/simple_inf_ostrvo.json
+```
 
 ## Instructions
 

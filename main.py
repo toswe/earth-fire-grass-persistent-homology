@@ -30,7 +30,7 @@ TEXT_COLOR = (255, 255, 255)
 
 
 # TODO Implement this better
-def init_cell_and_window():
+def init_globals():
     global CELL_SIZE
     CELL_SIZE = WINDOW_EDGE_SIZE // CONFIGURATION["GRID_SIZE"]
     global WINDOW_SIZE
@@ -38,9 +38,9 @@ def init_cell_and_window():
         CELL_SIZE * CONFIGURATION["GRID_SIZE"],
         CELL_SIZE * CONFIGURATION["GRID_SIZE"],
     )
-
-
-init_cell_and_window()
+    # TODO Set these up
+    # global EARTH_LIFESPAN
+    # global FIRE_LIFESPAN
 
 # Types
 WATER = 0
@@ -226,7 +226,6 @@ def load_simulation(file_path):
 
     global CONFIGURATION
     CONFIGURATION = save_obj["config"]
-    init_cell_and_window()
 
     return [
         [TYPE_TO_TILE[tile_type].copy() for tile_type in row]
@@ -244,6 +243,8 @@ def main():
 
     print("Initializing simulation with following config:")
     pprint(CONFIGURATION)
+
+    init_globals()
     pygame.init()
     pygame.display.set_caption("Fire Simulation")
     screen = pygame.display.set_mode(WINDOW_SIZE)
@@ -302,7 +303,7 @@ def main():
             grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
-            iteration =+ 1
+            iteration += 1
 
             if CONFIGURATION["SAVE_HISTORY"] or CONFIGURATION["PROCESS_HISTORY"]:
                 history.append(grid_to_matrix(grid))
