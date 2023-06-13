@@ -1,3 +1,7 @@
+# Generated with chat GPT4
+# Link to conversation:
+# https://chat.openai.com/share/aaf73e8c-60b2-47c9-8102-f1299bfd00a2
+
 import pygame
 
 # Define some colors

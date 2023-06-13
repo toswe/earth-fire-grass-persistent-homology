@@ -1,3 +1,7 @@
+# Generated with chat GPT4
+# Link to conversation:
+# https://chat.openai.com/share/9963b38d-2a15-4d4e-94fb-1461ade04a10
+
 import pygame
 import random
 
