@@ -4,6 +4,7 @@ from datetime import datetime
 import sys
 
 import pygame
+from pygame_screen_recorder import pygame_screen_recorder as pgr
 
 from process_history import process_history
 
@@ -17,6 +18,7 @@ SAVE_HISTORY = False
 PROCESS_HISTORY = False
 FRAMERATE = 30
 SIMPLE_COLORS = False
+RECORD_GAME = True
 
 ###################################################
 ############### GLOBAL VARIABLES ##################
@@ -239,6 +241,9 @@ def main():
     else:
         grid = create_default_grid()
 
+    if RECORD_GAME:
+        recorder = pgr(f"recordings/{file_path.split('/')[-1][:-5]}.gif")
+
     if SAVE_HISTORY or PROCESS_HISTORY:
         history = []
 
@@ -288,6 +293,9 @@ def main():
                 history.append(grid_to_matrix(grid))
             update_grid(grid)
 
+            if RECORD_GAME:
+                recorder.click(screen)
+
         draw_grid(screen, grid)
         message = (
             f"Simulation active: {simulation_active}, "
@@ -298,6 +306,10 @@ def main():
         # Update the screen and wait for the next frame
         pygame.display.flip()
         clock.tick(FRAMERATE)
+
+    if RECORD_GAME:
+        print("Saving recording.")
+        recorder.save()
 
     # Quit Pygame
     pygame.quit()
