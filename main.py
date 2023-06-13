@@ -26,12 +26,16 @@ WINDOW_SIZE = 0
 DEFAULT_FILE_PATH = f"./saves/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
 TEXT_COLOR = (255, 255, 255)
 
+
 # TODO Implement this better
 def init_cell_and_window():
     global CELL_SIZE
     CELL_SIZE = WINDOW_EDGE_SIZE // CONFIGURATION["GRID_SIZE"]
     global WINDOW_SIZE
-    WINDOW_SIZE = (CELL_SIZE * CONFIGURATION["GRID_SIZE"], CELL_SIZE * CONFIGURATION["GRID_SIZE"])
+    WINDOW_SIZE = (
+        CELL_SIZE * CONFIGURATION["GRID_SIZE"],
+        CELL_SIZE * CONFIGURATION["GRID_SIZE"],
+    )
 
 
 init_cell_and_window()
@@ -199,28 +203,43 @@ def grid_to_matrix(grid):
     return [[tile["type"] for tile in row] for row in grid]
 
 
-def save_grid(grid, file_path):
+def save_simulation(grid, file_path):
     with open(file_path, "w") as file:
-        json.dump(grid_to_matrix(grid), file)
+        save_obj = {
+            "config": CONFIGURATION,
+            "matrix": grid_to_matrix(grid),
+        }
+        json.dump(save_obj, file, indent=4)
     return file_path
 
 
 def create_default_grid():
-    return [[GRASS_TILE.copy() for x in range(CONFIGURATION["GRID_SIZE"])] for y in range(CONFIGURATION["GRID_SIZE"])]
+    size = CONFIGURATION["GRID_SIZE"]
+    return [[GRASS_TILE.copy() for x in range(size)] for y in range(size)]
 
 
-def load_grid(file_path):
+def load_simulation(file_path):
     with open(file_path) as file:
-        matrix = json.load(file)
+        save_obj = json.load(file)
 
     global CONFIGURATION
-    CONFIGURATION["GRID_SIZE"] = len(matrix)
+    CONFIGURATION = save_obj["config"]
     init_cell_and_window()
 
-    return [[TYPE_TO_TILE[tile_type].copy() for tile_type in row] for row in matrix]
+    return [
+        [TYPE_TO_TILE[tile_type].copy() for tile_type in row]
+        for row in save_obj["matrix"]
+    ]
 
 
 def main():
+    file_path = DEFAULT_FILE_PATH
+    if len(sys.argv) == 2:
+        file_path = sys.argv[1]
+        grid = load_simulation(file_path)
+    else:
+        grid = create_default_grid()
+
     print("Initializing simulation.")
     pygame.init()
     pygame.display.set_caption("Fire Simulation")
@@ -228,16 +247,8 @@ def main():
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 20)
 
-    file_path = DEFAULT_FILE_PATH
-    if len(sys.argv) == 2:
-        file_path = sys.argv[1]
-        grid = load_grid(file_path)
-        screen = pygame.display.set_mode(WINDOW_SIZE)
-    else:
-        grid = create_default_grid()
-
     if CONFIGURATION["RECORD_GAME"]:
-        recorder = pgr(f"recordings/{file_path.split('/')[-1][:-5]}.gif")
+        recorder = pgr(f"recordings/{file_path.split('/')[-1].split('.')[0]}.gif")
 
     if CONFIGURATION["SAVE_HISTORY"] or CONFIGURATION["PROCESS_HISTORY"]:
         history = []
@@ -274,7 +285,7 @@ def main():
                     global SIMPLE_COLORS
                     SIMPLE_COLORS = not SIMPLE_COLORS
                 elif event.key == pygame.K_s:
-                    save_grid(grid, file_path)
+                    save_simulation(grid, file_path)
 
         # Handle mouse input
         if mouse_down:
