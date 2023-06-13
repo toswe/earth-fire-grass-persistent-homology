@@ -1,4 +1,13 @@
 {
+    "config": {
+        "GRID_SIZE": 12,
+        "TILE_LIFESPAN": 1,
+        "SAVE_HISTORY": false,
+        "PROCESS_HISTORY": true,
+        "FRAMERATE": 30,
+        "RECORD_GAME": false,
+        "MAX_ITERATIONS": 20
+    },
     "matrix": [
         [
             3,
@@ -168,14 +177,5 @@
             3,
             3
         ]
-    ],
-    "config": {
-        "GRID_SIZE": 12,
-        "TILE_LIFESPAN": 1,
-        "SAVE_HISTORY": false,
-        "PROCESS_HISTORY": false,
-        "FRAMERATE": 30,
-        "RECORD_GAME": false,
-        "MAX_ITERATIONS": -1
-    }
+    ]
 }

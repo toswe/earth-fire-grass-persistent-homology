@@ -38,9 +38,31 @@ def init_globals():
         CELL_SIZE * CONFIGURATION["GRID_SIZE"],
         CELL_SIZE * CONFIGURATION["GRID_SIZE"],
     )
-    # TODO Set these up
-    # global EARTH_LIFESPAN
-    # global FIRE_LIFESPAN
+    global EARTH_LIFESPAN
+    global FIRE_LIFESPAN
+    global EARTH_TILE
+    global FIRE_TILE
+    global TYPE_TO_TILE
+
+    EARTH_LIFESPAN = CONFIGURATION["TILE_LIFESPAN"]
+    FIRE_LIFESPAN = CONFIGURATION["TILE_LIFESPAN"]
+
+    EARTH_TILE = {
+        "type": EARTH,
+        "lifespan": EARTH_LIFESPAN,
+    }
+    FIRE_TILE = {
+        "type": FIRE,
+        "lifespan": FIRE_LIFESPAN,
+    }
+
+    TYPE_TO_TILE = {
+        WATER: WATER_TILE,
+        EARTH: EARTH_TILE,
+        FIRE: FIRE_TILE,
+        GRASS: GRASS_TILE,
+    }
+
 
 # Types
 WATER = 0
@@ -227,6 +249,7 @@ def load_simulation(file_path):
     global CONFIGURATION
     CONFIGURATION = save_obj["config"]
 
+    init_globals()
     return [
         [TYPE_TO_TILE[tile_type].copy() for tile_type in row]
         for row in save_obj["matrix"]
