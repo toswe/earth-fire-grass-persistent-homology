@@ -2,6 +2,7 @@ import random
 import json
 from datetime import datetime
 import sys
+from pprint import pprint
 
 import pygame
 from pygame_screen_recorder import pygame_screen_recorder as pgr
@@ -15,6 +16,7 @@ CONFIGURATION = {
     "PROCESS_HISTORY": False,
     "FRAMERATE": 30,
     "RECORD_GAME": False,
+    "MAX_ITERATIONS": -1,
 }
 
 SIMPLE_COLORS = False
@@ -240,7 +242,8 @@ def main():
     else:
         grid = create_default_grid()
 
-    print("Initializing simulation.")
+    print("Initializing simulation with following config:")
+    pprint(CONFIGURATION)
     pygame.init()
     pygame.display.set_caption("Fire Simulation")
     screen = pygame.display.set_mode(WINDOW_SIZE)
@@ -259,7 +262,11 @@ def main():
 
     # Main game loop
     done = False
+    iteration = 0
     while not done:
+        if iteration == CONFIGURATION["MAX_ITERATIONS"]:
+            break
+
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -295,6 +302,8 @@ def main():
             grid[cell_x][cell_y].update(TYPE_TO_TILE[active_coloring_type])
 
         if simulation_active:
+            iteration =+ 1
+
             if CONFIGURATION["SAVE_HISTORY"] or CONFIGURATION["PROCESS_HISTORY"]:
                 history.append(grid_to_matrix(grid))
             update_grid(grid)

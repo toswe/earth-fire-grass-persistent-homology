@@ -12,7 +12,7 @@ model played on a finite 2D square lattice. It has three simple rules:
 2. When earth is fertile, determined by `EARTH_LIFESPAN`, it turns into grass
 3. Fire burns grass
 
-Fire randomly selects on tile among neighbors that are grass, and sets it on fire.
+Fire randomly selects one tile among neighbors that are grass, and sets it on fire.
 This means that if there is a single grass in the neighborhood of a fire tile,
 the grass tile will be set on fire with probability = 1.
 This selection mechanism is the only source of randomness in the game.
@@ -71,6 +71,7 @@ SAVE_HISTORY - Boolean flag indicating if history should be saved
 PROCESS_HISTORY - Boolean flag indicating if history should be proccessed after simulation ends
 FRAMERATE - Representing the frames per second for the simulation
 RECORD_GAME - Boolean flag indicating if the game should be recorded
+MAX_ITERATIONS - Maximum number of iterations (set to -1 if not used)
 ```
 
 ### Saving
