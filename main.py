@@ -7,17 +7,25 @@ import pygame
 
 from process_history import process_history
 
-# Set the dimensions of each cell and the grid size
+###################################################
+############ CONFIGURATION VARIABLES ##############
+###################################################
+
 GRID_SIZE = 12
+TILE_LIFESPAN = 5
+SAVE_HISTORY = False
+PROCESS_HISTORY = False
+FRAMERATE = 30
+SIMPLE_COLORS = False
+
+###################################################
+############### GLOBAL VARIABLES ##################
+###################################################
+
 WINDOW_EDGE_SIZE = 500
 CELL_SIZE = 0
 WINDOW_SIZE = 0
 
-TILE_LIFESPAN = 5
-FRAMERATE = 30
-SIMPLE_COLORS = False
-SAVE_HISTORY = False
-PROCESS_HISTORY = False
 DEFAULT_FILE_PATH = f"./saves/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
 TEXT_COLOR = (255, 255, 255)
 
@@ -39,6 +47,7 @@ GRASS = 3
 
 EARTH_LIFESPAN = TILE_LIFESPAN
 FIRE_LIFESPAN = TILE_LIFESPAN
+
 # Depricated
 FIRE_PROBABILITY = 0.1
 
@@ -226,6 +235,7 @@ def main():
     if len(sys.argv) == 2:
         file_path = sys.argv[1]
         grid = load_grid(file_path)
+        screen = pygame.display.set_mode(WINDOW_SIZE)
     else:
         grid = create_default_grid()
 
