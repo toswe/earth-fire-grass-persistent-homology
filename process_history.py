@@ -15,6 +15,7 @@ TRIVIAL_HOLES = {
     (0, (0.0, numpy.inf)),
 }
 USE_ALPHA_COMPLEX = True
+FIRE_TILE_TYPE = 2
 
 
 def history_to_points(history):
@@ -24,7 +25,7 @@ def history_to_points(history):
         for y, row in enumerate(grid):
             # print(row)
             for x, tile in enumerate(row):
-                if tile != 2:
+                if tile != FIRE_TILE_TYPE:
                     points.append((x, y, z))
 
     return points
@@ -33,7 +34,6 @@ def history_to_points(history):
 def process_history(history):
     print(f"History length: {len(history)}")
     points = history_to_points(history)
-    del history
 
     if USE_ALPHA_COMPLEX:
         print("Creating Alpha Complex")
@@ -60,10 +60,15 @@ def process_history(history):
         diag = simplex_tree.persistence(homology_coeff_field=2, min_persistence=0)
 
     diag = [d for d in diag if d not in TRIVIAL_HOLES]
-    print("diag=", diag)
+    # print("diag=", diag)
 
     gudhi.plot_persistence_diagram(diag)
     gudhi.plot_persistence_barcode(diag, max_intervals=30)
+
+    print("Rendering 3D plot for fire tiles")
+    ax = plot.figure().add_subplot(projection="3d")
+    ax.voxels(numpy.array(history) == FIRE_TILE_TYPE, edgecolor="k")
+
     plot.show()
 
 
