@@ -5,7 +5,7 @@
         "SAVE_HISTORY": false,
         "PROCESS_HISTORY": true,
         "FRAMERATE": 30,
-        "RECORD_GAME": false,
+        "RECORD_GAME": true,
         "MAX_ITERATIONS": 20
     },
     "matrix": [
