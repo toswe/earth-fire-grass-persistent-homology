@@ -19,6 +19,8 @@ This selection mechanism is the only source of randomness in the game.
 
 The water tile stays the same through out the simulation.
 
+The presentation for this project can be found [here](https://www.canva.com/design/DAFluzy7zQg/qpie63IgcbrNIeP3h9UwDw/view?utm_content=DAFluzy7zQg&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink).
+
 ## Requirements
 
 Python 3.10.4 was used for this project.
