@@ -365,7 +365,7 @@ def main():
             json.dump(history, file)
 
     if CONFIGURATION["PROCESS_HISTORY"]:
-        process_history(history)
+        process_history(history, file_path.split('/')[-1].split('.')[0])
 
 
 if __name__ == "__main__":

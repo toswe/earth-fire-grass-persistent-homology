@@ -18,6 +18,7 @@ TRIVIAL_HOLES = {
 
 USE_ALPHA_COMPLEX = True
 MAX_INTERVALS_BARCODE_CHART = 30  # set to 0 to show all
+PLOT_DIRECTORY = "plots/"
 
 
 def history_to_points(history):
@@ -56,7 +57,7 @@ def process_points_rips(points):
     return simplex_tree.persistence(homology_coeff_field=2, min_persistence=0)
 
 
-def process_points(points):
+def process_points(points, file_name):
     if USE_ALPHA_COMPLEX:
         diag = process_points_alpha(points)
     else:
@@ -68,21 +69,25 @@ def process_points(points):
     # print("diag=", diag)
 
     gudhi.plot_persistence_diagram(diag)
+    plot.savefig(f"{PLOT_DIRECTORY}{file_name}_persistence_diagram.png")
+
     gudhi.plot_persistence_barcode(diag, max_intervals=MAX_INTERVALS_BARCODE_CHART)
+    plot.savefig(f"{PLOT_DIRECTORY}{file_name}_persistence_barcode.png")
 
 
-def render_3D_fire(history):
+def render_3D_fire(history, file_name):
     print("Rendering 3D plot for fire tiles")
     ax = plot.figure().add_subplot(projection="3d")
     ax.voxels(numpy.array(history) == FIRE_TILE_TYPE, edgecolor="k")
+    plot.savefig(f"{PLOT_DIRECTORY}{file_name}_voxels.png")
 
 
-def process_history(history):
+def process_history(history, file_name):
     print(f"History length: {len(history)}")
     points = history_to_points(history)
 
-    process_points(points)
-    render_3D_fire(history)
+    process_points(points, file_name)
+    render_3D_fire(history, file_name)
 
     plot.show()
 
@@ -92,10 +97,11 @@ def main():
         print("Missing history...")
         return
 
-    with open(sys.argv[1], "r") as file:
+    file_path = sys.argv[1]
+    with open(file_path, "r") as file:
         history = json.load(file)
 
-    process_history(history)
+    process_history(history, file_path.split("/")[-1].split(".")[0])
 
 
 if __name__ == "__main__":

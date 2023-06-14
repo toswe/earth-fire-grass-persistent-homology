@@ -134,3 +134,5 @@ The result of the processing are the following graphs:
 1. The persistance diagram of the data topology
 2. The barcode persistance diagram of the data topology
 3. The rendering of the 3D space ocupied by the fire tiles
+
+The resulting plots will be saved in the `plots` directory.
