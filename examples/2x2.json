@@ -1,0 +1,21 @@
+{
+    "config": {
+        "GRID_SIZE": 2,
+        "TILE_LIFESPAN": 0,
+        "SAVE_HISTORY": false,
+        "PROCESS_HISTORY": false,
+        "FRAMERATE": 1,
+        "RECORD_GAME": false,
+        "MAX_ITERATIONS": -1
+    },
+    "matrix": [
+        [
+            0,
+            2
+        ],
+        [
+            3,
+            1
+        ]
+    ]
+}
